@@ -2,11 +2,15 @@ name: Auto Commit
 
 on:
   schedule:
-    - cron: "*/5 * * * *"   # every 5 minutes
+    - cron: "*/5 * * * *"    # Har 5 min (UTC)
+    - cron: "1-59/5 * * * *"  # Alternative pattern
+    - cron: "*/5 * * * *"     # Duplicate for force
   workflow_dispatch:
+  push:
+    branches: [ main ]  # Push par bhi chalega
 
 permissions:
-  contents: write  # ✅ IMPORTANT: Write permission dena
+  contents: write
 
 jobs:
   auto-commit:
@@ -14,25 +18,41 @@ jobs:
 
     steps:
       - name: Checkout repo
-        uses: actions/checkout@v4  # ✅ v3 se v4 kiya (Node.js warning fix)
+        uses: actions/checkout@v4
         with:
-          token: ${{ secrets.AUTH_TOKEN }}  # ✅ Token explicitly dena
+          token: ${{ secrets..AUTH_TOKEN }}
+          fetch-depth: 0
 
-      - name: Make change
+      - name: Force change with timestamp
         run: |
-          echo "Update: $(date)" >> auto-log.txt
+          # Multiple files change karo har baar
+          echo "Last run: $(date)" > last-run.txt
+          echo "$(date)" >> timestamp.log
+          date > current-time.txt
+         
+          # Counter file maintain karo
+          if [ -f counter.txt ]; then
+            count=$(cat counter.txt)
+            echo $((count+1)) > counter.txt
+          else
+            echo "1" > counter.txt
+          fi
+         
+          echo "Changes made at $(date)"
 
-      - name: Commit and push
+      - name: Git config
         run: |
           git config --global user.name "sajid377"
           git config --global user.email "sajid.dev90@gmail.com"
-          git config --global --add safe.directory /github/workspace  # ✅ Safe directory add
+          git config --global --add safe.directory /github/workspace
+
+      - name: Commit and push
+        run: |
           git add .
          
-          # ✅ Better change check
-          if git diff --cached --quiet; then
-            echo "No changes to commit"
-          else
-            git commit -m "Auto commit $(date)"
-            git push
-          fi
+          # Force commit har baar
+          git commit -m "Auto commit: $(date '+%Y-%m-%d %H:%M:%S') (Run #$(cat counter.txt))"
+          git pull --rebase origin main  # Conflicts avoid karo
+          git push
+         
+          echo " Commit done at $(date)"
