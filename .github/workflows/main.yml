@@ -1,0 +1,38 @@
+name: Auto Commit
+
+on:
+  schedule:
+    - cron: "*/5 * * * *"   # every 5 minutes
+  workflow_dispatch:
+
+permissions:
+  contents: write  # ✅ IMPORTANT: Write permission dena
+
+jobs:
+  auto-commit:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4  # ✅ v3 se v4 kiya (Node.js warning fix)
+        with:
+          token: ${{ secrets.AUTH_TOKEN }}  # ✅ Token explicitly dena
+
+      - name: Make change
+        run: |
+          echo "Update: $(date)" >> auto-log.txt
+
+      - name: Commit and push
+        run: |
+          git config --global user.name "sajid377"
+          git config --global user.email "sajid.dev90@gmail.com"
+          git config --global --add safe.directory /github/workspace  # ✅ Safe directory add
+          git add .
+         
+          # ✅ Better change check
+          if git diff --cached --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "Auto commit $(date)"
+            git push
+          fi
