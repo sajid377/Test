@@ -48,5 +48,5 @@ jobs:
             git add "$FILE"
             git commit -m "workflow commit #$i" || echo "Nothing to commit"
 
-            git push https://x-access-token:${{ secrets.AUTO_COMMIT_TOKEN }}@github.com/sajid377/Test.git
+            git push https://x-access-token:${{ secrets.AUTH_TOKEN }}@github.com/sajid377/Test.git
           done
