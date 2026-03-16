@@ -40,7 +40,7 @@ jobs:
             git config --global user.email "sajid.dev90@gmail.com"
             git add "$FILE"
             git commit -m "workflow commit #$i"
-            git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/sajid377/Test.git
+            git push https://x-access-token:${{ secrets.AUTH_TOKEN }}@github.com/sajid377/Test.git
           done
         env:
-          GITHUB_TOKEN: ${{secrets.AUTO_COMMIT_TOKEN }}
+          AUTH_TOKEN: ${{secrets.AUTO_COMMIT_TOKEN }}
