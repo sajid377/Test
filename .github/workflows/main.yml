@@ -4,12 +4,6 @@ on:
   schedule:
     - cron: '0 0 * * *'  # Every day at midnight UTC to runs every 7-8 min set cron to '*/1 * * * *'
   workflow_dispatch:
-  # push:
-  #   branches: [ main ]  # Push par bhi chalega
-
-# permissions:
-#   contents: write
-
 jobs:
   commit:
     runs-on: ubuntu-latest
